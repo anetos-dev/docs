@@ -1,0 +1,11 @@
+{{- /* Links between anetos.dev and docs.anetos.dev open in the same tab; the theme opens every absolute link in a new one. */ -}}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('a[target="_blank"]').forEach(function (a) {
+      try {
+        var host = new URL(a.href).hostname;
+        if (host === "anetos.dev" || host.endsWith(".anetos.dev")) a.removeAttribute("target");
+      } catch (e) {}
+    });
+  });
+</script>

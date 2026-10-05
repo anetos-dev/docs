@@ -1,0 +1,19 @@
+{{- /*
+Images in the framework's pages are relative to their place in the
+repository (sourcePath, set by ./sync), and ./sync serves docs/site's
+files at the same paths: "../img/flow.png" in docs/site/guides/forms.md
+is /img/flow.png. Images outside docs/site come from GitHub.
+*/ -}}
+{{- $dest := .Destination -}}
+{{- $src := .PageInner.Params.sourcePath -}}
+{{- $u := urls.Parse $dest -}}
+{{- if and $src $u.Path (not $u.IsAbs) (not (hasPrefix $dest "/")) -}}
+  {{- $target := path.Clean (path.Join (path.Dir $src) $u.Path) -}}
+  {{- if hasPrefix $target "docs/site/" -}}
+    {{- $dest = strings.TrimPrefix "docs/site" $target | relURL -}}
+  {{- else -}}
+    {{- $dest = printf "https://raw.githubusercontent.com/anetos-dev/anetos/%s/%s" site.Params.anetosRef $target -}}
+  {{- end -}}
+{{- end -}}
+<img src="{{ $dest | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
+{{- /* */ -}}

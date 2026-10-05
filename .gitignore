@@ -18,3 +18,5 @@ coverage.*
 .hugo_build.lock
 node_modules/
 /content/
+/.anetos/
+/files/

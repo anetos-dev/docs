@@ -1,0 +1,13 @@
+{{ define "main" }}
+  <div class="hx:mx-auto hx:flex hextra-max-page-width">
+    {{- /* the mobile menu's container, which the theme's script expects */ -}}
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" false) }}
+    <article class="hx:w-full hx:flex hx:min-h-[calc(100vh-var(--hextra-navbar-height))] hx:justify-center">
+      <main id="content" class="hx:w-full hextra-max-content-width hx:px-6 hx:text-center" style="padding-top: 6rem">
+        <h1 class="hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">Page not found</h1>
+        <p class="hx:mt-6 hx:text-gray-600 hx:dark:text-gray-400">There is no page at this address; it may have moved.</p>
+        <p class="hx:mt-6"><a class="hx:text-primary-600 hx:underline" href="{{ site.Home.RelPermalink }}">Go to {{ site.Title }}</a></p>
+      </main>
+    </article>
+  </div>
+{{ end }}

@@ -1,0 +1,120 @@
+# docs.anetos.dev, on Hugo and the Hextra theme. The pages come from the
+# framework's docs/site folder: ./build.sh fetches them, turns them into
+# content/ (go run ./sync) and builds the site.
+baseURL: https://docs.anetos.dev/
+locale: en
+title: Anetos docs
+disableKinds: [taxonomy, term, rss]
+enableRobotsTXT: true
+
+module:
+  hugoVersion:
+    min: "0.158.0"
+  imports:
+    - path: github.com/imfing/hextra
+      # the theme's own icons and logos stay out; ours are in static/
+      mounts:
+        - { source: assets, target: assets }
+        - { source: data, target: data }
+        - { source: i18n, target: i18n }
+        - { source: layouts, target: layouts }
+        - source: static
+          target: static
+          files: ["! android-chrome-*", "! images/**"]
+  mounts:
+    - { source: content, target: content }
+    - { source: assets, target: assets }
+    - { source: i18n, target: i18n }
+    - { source: layouts, target: layouts }
+    - { source: static, target: static }
+    # docs/site's images and other files, copied by ./sync
+    - { source: files, target: static }
+
+# Every page uses the documentation layout (sidebar, table of contents).
+cascade:
+  - target:
+      path: "{/,/**}"
+    params:
+      type: docs
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+  tableOfContents:
+    startLevel: 2
+    endLevel: 3
+
+outputs:
+  home: [html]
+  page: [html]
+  section: [html]
+
+menu:
+  main:
+    - name: Getting started
+      pageRef: /getting-started/
+      weight: 1
+    - name: Guides
+      pageRef: /guides/
+      weight: 2
+    - name: Reference
+      pageRef: /reference/
+      weight: 3
+    - name: Search
+      weight: 4
+      params:
+        type: search
+    - name: anetos.dev
+      url: https://anetos.dev/
+      weight: 5
+    - name: GitHub
+      url: https://github.com/anetos-dev/anetos
+      weight: 6
+      params:
+        icon: github
+
+params:
+  description: The documentation of Anetos, a batteries-included web framework for Go.
+  images: [brand/social-preview.png]
+  # The framework's branch or tag the pages come from (build.sh sets
+  # HUGO_PARAMS_ANETOSREF); links to files outside docs/site point at it.
+  anetosRef: main
+  navbar:
+    displayTitle: false
+    displayLogo: true
+    logo:
+      path: brand/anetos-logo.svg
+      dark: brand/anetos-logo-dark.svg
+      link: /
+      width: 118
+      height: 22
+  page:
+    width: wide
+  theme:
+    default: system
+    displayToggle: true
+  footer:
+    enable: true
+    displayCopyright: true
+    displayPoweredBy: false
+  editURL:
+    enable: true
+  search:
+    enable: true
+    type: flexsearch
+    flexsearch:
+      index: content
+      tokenize: forward
+      # served from assets/lib (see its README) rather than the CDN
+      js: lib/flexsearch-0.8.143.bundle.min.js
+  mermaid:
+    js: lib/mermaid-11.17.2.min.js
+  highlight:
+    copy:
+      enable: true
+      display: hover
+  toc:
+    displayTags: false

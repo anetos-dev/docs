@@ -1,0 +1,18 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/brand/*
+  Cache-Control: public, max-age=86400
+
+# fingerprinted by Hugo: the name changes with the content
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+/lib/*
+  Cache-Control: public, max-age=31536000, immutable
+/en.search*
+  Cache-Control: public, max-age=31536000, immutable

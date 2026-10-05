@@ -1,0 +1,61 @@
+/* Anetos blue (#4B9AD2) as the theme's primary colour. */
+:root {
+  --primary-hue: 205deg;
+  --primary-saturation: 60%;
+  --primary-lightness: 50%;
+}
+
+.dark {
+  --primary-hue: 205deg;
+  --primary-saturation: 62%;
+  --primary-lightness: 58%;
+}
+
+/* The home page's sections */
+.anetos-section {
+  margin-top: 4rem;
+  width: 100%;
+}
+
+.anetos-section h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.anetos-lead {
+  max-width: 44rem;
+  color: rgb(75 85 99);
+}
+
+.dark .anetos-lead {
+  color: rgb(156 163 175);
+}
+
+.anetos-lead {
+  margin-bottom: 1.5rem;
+}
+
+.anetos-lead a {
+  color: var(--color-primary-600, #2b7bb9);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Feature cards: smaller titles than the theme's, for longer names */
+.hextra-feature-card h3 {
+  font-size: 1.2rem;
+  line-height: 1.6rem;
+}
+
+/* "Since v0.3.0" under a page's title */
+.anetos-since {
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: rgb(107 114 128);
+}
+.dark .anetos-since {
+  color: rgb(156 163 175);
+}

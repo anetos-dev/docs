@@ -1,0 +1,50 @@
+{{- /*
+Links in the framework's pages are relative to their place in the
+repository (sourcePath, set by ./sync): "../reference/cli.md",
+"getting-started/", "../../../examples/files/main.go". Those that land
+in docs/site become links to the site's pages (a missing page is a
+warning, and the link goes to GitHub); the others point at the file on
+GitHub, at the branch or tag the pages come from. Other links
+(absolute, anchors, pages without a sourcePath) are left as they are.
+*/ -}}
+{{- $dest := .Destination -}}
+{{- $src := .PageInner.Params.sourcePath -}}
+{{- $u := urls.Parse $dest -}}
+{{- $suffix := "" -}}
+{{- with $u.RawQuery }}{{ $suffix = printf "?%s" . }}{{ end -}}
+{{- with $u.Fragment }}{{ $suffix = printf "%s#%s" $suffix . }}{{ end -}}
+{{- if and $src $u.Path (not $u.IsAbs) (not (hasPrefix $dest "/")) -}}
+  {{- $target := path.Clean (path.Join (path.Dir $src) $u.Path) -}}
+  {{- $page := false -}}
+  {{- if or (eq $target "docs/site") (hasPrefix $target "docs/site/") -}}
+    {{- $rel := strings.TrimPrefix "docs/site" $target -}}
+    {{- if eq (path.Base $rel) "README.md" -}}
+      {{- $rel = path.Dir $rel -}}
+    {{- end -}}
+    {{- $rel = strings.TrimSuffix ".md" $rel -}}
+    {{- if in (slice "" "/" ".") $rel -}}
+      {{- $page = site.Home -}}
+    {{- else -}}
+      {{- with site.GetPage $rel -}}
+        {{- $page = . -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if and (not $page) (strings.HasSuffix $u.Path ".md") -}}
+      {{- warnf "%s: link to %q: no such page (%s)" $src $dest $target -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $page -}}
+    {{- $dest = printf "%s%s" $page.RelPermalink $suffix -}}
+  {{- else -}}
+    {{- $kind := cond (eq (path.Ext $target) "") "tree" "blob" -}}
+    {{- $dest = printf "https://github.com/anetos-dev/anetos/%s/%s/%s%s" $kind site.Params.anetosRef $target $suffix -}}
+  {{- end -}}
+{{- else if and (not $u.IsAbs) $u.Path (strings.HasSuffix $u.Path ".md") -}}
+  {{- with .PageInner.GetPage (strings.TrimSuffix ".md" $u.Path) -}}
+    {{- $dest = printf "%s%s" .RelPermalink $suffix -}}
+  {{- end -}}
+{{- end -}}
+{{- $host := (urls.Parse $dest).Host -}}
+{{- $external := and $host (ne $host "anetos.dev") (not (strings.HasSuffix $host ".anetos.dev")) -}}
+<a href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if $external }} target="_blank" rel="noopener"{{ end }}>{{ .Text | safeHTML }}</a>
+{{- /* */ -}}

@@ -1,0 +1,7 @@
+{{- /* "Since vX.Y.Z" from the page's front matter. v0.3.0 is the first
+public version: pages from the private v0.1 and v0.2 say nothing. */ -}}
+{{- with .Params.since -}}
+  {{- if not (or (hasPrefix . "v0.1.") (hasPrefix . "v0.2.")) -}}
+<p class="anetos-since">Since {{ . }}</p>
+  {{- end -}}
+{{- end -}}

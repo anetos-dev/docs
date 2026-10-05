@@ -1,0 +1,6 @@
+{{- /* "Migrations – Guides – Anetos docs": pages of the same name are in several sections. */ -}}
+{{- if .IsHome -}}
+  {{- site.Title -}}
+{{- else -}}
+  {{- .Title }} – {{ with .Parent }}{{ if not .IsHome }}{{ .Title }} – {{ end }}{{ end }}{{ site.Title -}}
+{{- end -}}
