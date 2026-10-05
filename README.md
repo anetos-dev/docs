@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/anetos-logo-dark.svg">
+    <img alt="Anetos" src=".github/assets/anetos-logo.svg" width="240">
+  </picture>
+</p>
+
 # docs.anetos.dev
 
 The builder of [docs.anetos.dev](https://docs.anetos.dev), the
