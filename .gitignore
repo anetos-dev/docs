@@ -1,0 +1,20 @@
+# Test output
+*.test
+*.out
+coverage.*
+
+# Editors and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Files saved by the Claude desktop app
+/Claude outputs/
+
+# Site build output, and the docs pulled from the framework at build time
+/public/
+/resources/_gen/
+.hugo_build.lock
+node_modules/
+/content/
