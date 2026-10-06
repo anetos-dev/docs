@@ -15,6 +15,14 @@
 //     sourcePath (the page's path in the repository, which the link and
 //     image render hooks resolve relative paths against) and editURL
 //     (always on main: GitHub can't edit a file on a tag).
+//   - Pages with a group in their front matter (group: "Basics") go into
+//     a folder of their section named after it (content/guides/basics/),
+//     which the sidebar shows as a group of its own, ordered by the
+//     smallest weight of its pages; the page keeps its URL (/guides/forms/,
+//     front matter url), and data/moved.json maps its old content path
+//     to the new one for the link render hook. The group's folder gets
+//     an index listing its pages, and a section without a README lists
+//     its pages by group. The framework's docnav checks the groups.
 //   - Other files (images…) are copied to the -files folder, which Hugo
 //     serves at their path in docs/site.
 //   - The files in overlay/ (the docs' home page) are copied over the top.
@@ -23,6 +31,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -32,6 +41,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -48,12 +58,14 @@ var sections = []struct{ dir, title, intro string }{
 const repo = "https://github.com/anetos-dev/anetos"
 
 type page struct {
-	rel   string // path in docs/site ("guides/forms.md"); "" if generated
-	out   string // path in content ("guides/forms.md", "upgrade/_index.md")
-	front []string
-	title string
-	intro string
-	body  []byte
+	rel    string // path in docs/site ("guides/forms.md"); "" if generated
+	out    string // path in content ("guides/forms.md", "upgrade/_index.md")
+	front  []string
+	title  string
+	intro  string
+	body   []byte
+	group  string // front matter's group, "" for none
+	weight int    // front matter's weight, 0 for none
 }
 
 func main() {
@@ -61,18 +73,19 @@ func main() {
 	out := flag.String("out", "content", "the content folder to write (replaced)")
 	files := flag.String("files", "files", "the folder for the other files, served as they are (replaced)")
 	overlay := flag.String("overlay", "overlay", "files copied over the result")
+	data := flag.String("data", "data", "the data folder, for moved.json (the file is replaced)")
 	flag.Parse()
 	if *src == "" {
 		fmt.Fprintln(os.Stderr, "usage: sync -src <anetos>/docs/site [-out content] [-files files] [-overlay overlay]")
 		os.Exit(2)
 	}
-	if err := run(*src, *out, *files, *overlay); err != nil {
+	if err := run(*src, *out, *files, *overlay, *data); err != nil {
 		fmt.Fprintln(os.Stderr, "sync:", err)
 		os.Exit(1)
 	}
 }
 
-func run(src, out, files, overlay string) error {
+func run(src, out, files, overlay, data string) error {
 	for _, dir := range []string{out, files} {
 		if err := os.RemoveAll(dir); err != nil {
 			return err
@@ -107,6 +120,17 @@ func run(src, out, files, overlay string) error {
 		return nil
 	})
 	if err != nil {
+		return err
+	}
+	pages, moved, err := group(pages)
+	if err != nil {
+		return err
+	}
+	b, err := json.MarshalIndent(moved, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := writeFile(filepath.Join(data, "moved.json"), append(b, '\n')); err != nil {
 		return err
 	}
 	have := map[string]bool{}
@@ -205,6 +229,13 @@ func parse(rel string, data []byte) (*page, error) {
 			if strings.HasPrefix(l, "title:") {
 				pg.title = strings.Trim(strings.TrimSpace(strings.TrimPrefix(l, "title:")), `"'`)
 			}
+			if v, ok := strings.CutPrefix(l, "group:"); ok {
+				pg.group = strings.Trim(strings.TrimSpace(v), `"'`)
+				continue // the folder says it
+			}
+			if v, ok := strings.CutPrefix(l, "weight:"); ok {
+				pg.weight, _ = strconv.Atoi(strings.TrimSpace(v))
+			}
 			pg.front = append(pg.front, l)
 		}
 		rest = rest[4+end+5:]
@@ -274,12 +305,22 @@ func generatedIndex(dir, title, intro string, pages []*page, have map[string]boo
 			kids = append(kids, pg)
 		}
 	}
-	slices.SortFunc(kids, func(a, b *page) int { return strings.Compare(strings.ToLower(a.title), strings.ToLower(b.title)) })
+	slices.SortFunc(kids, func(a, b *page) int {
+		if a.weight != b.weight {
+			return a.weight - b.weight
+		}
+		return strings.Compare(strings.ToLower(a.title), strings.ToLower(b.title))
+	})
 	var b bytes.Buffer
 	if intro != "" {
 		b.WriteString(intro + "\n\n")
 	}
+	group := ""
 	for _, k := range kids {
+		if k.group != group {
+			group = k.group
+			fmt.Fprintf(&b, "\n## %s\n\n", group)
+		}
 		fmt.Fprintf(&b, "- [%s](%s)", k.title, strings.TrimPrefix(k.rel, dir+"/"))
 		if intro := k.intro; intro != "" {
 			if path.Dir(k.rel) != dir {
@@ -316,4 +357,88 @@ var (
 // plain is Markdown text without its links and marks, for descriptions.
 func plain(md string) string {
 	return mdMarks.Replace(mdLink.ReplaceAllString(md, "$1"))
+}
+
+var nonWord = regexp.MustCompile(`[^a-z0-9]+`)
+
+// slug is a group's folder: "Accounts and security" →
+// accounts-and-security. The framework's docnav makes the same.
+func slug(group string) string {
+	return strings.Trim(nonWord.ReplaceAllString(strings.ToLower(group), "-"), "-")
+}
+
+// group moves the pages that name a group into a folder of their
+// section for it, keeping their URL, and adds each folder's index. It
+// returns the pages, and their old content paths (without .md) mapped
+// to the new ones, for the link render hook.
+func group(pages []*page) ([]*page, map[string]string, error) {
+	moved := map[string]string{}
+	type folder struct {
+		dir, title string
+		weight     int
+		pages      []*page
+	}
+	folders := map[string]*folder{}
+	var order []string
+	names := map[string]bool{} // the sections' pages and folders, by URL path
+	for _, pg := range pages {
+		names[strings.TrimSuffix(pg.out, ".md")] = true
+		for d := path.Dir(pg.rel); d != "."; d = path.Dir(d) {
+			names[d] = true
+		}
+	}
+	for _, pg := range pages {
+		if pg.group == "" {
+			continue
+		}
+		dir := path.Dir(pg.rel)
+		if path.Base(pg.rel) == "README.md" || strings.Contains(dir, "/") {
+			return nil, nil, fmt.Errorf("%s: only the pages directly in a section have a group", pg.rel)
+		}
+		key := dir + "/" + slug(pg.group)
+		if names[key] {
+			return nil, nil, fmt.Errorf("%s: group %q would take the URL of %s", pg.rel, pg.group, key)
+		}
+		f := folders[key]
+		if f == nil {
+			f = &folder{dir: key, title: pg.group, weight: pg.weight}
+			folders[key] = f
+			order = append(order, key)
+		}
+		f.weight = min(f.weight, pg.weight)
+		f.pages = append(f.pages, pg)
+		name := strings.TrimSuffix(path.Base(pg.rel), ".md")
+		old := strings.TrimSuffix(pg.out, ".md")
+		pg.out = key + "/" + name + ".md"
+		moved["/"+old] = "/" + strings.TrimSuffix(pg.out, ".md")
+		pg.set("url", "/"+dir+"/"+name+"/")
+	}
+	for _, key := range order {
+		f := folders[key]
+		slices.SortFunc(f.pages, func(a, b *page) int { return a.weight - b.weight })
+		var b bytes.Buffer
+		for _, k := range f.pages {
+			fmt.Fprintf(&b, "- [%s](%s)", k.title, path.Base(k.rel))
+			if k.intro != "" {
+				fmt.Fprintf(&b, ": %s", k.intro)
+			}
+			b.WriteString("\n")
+		}
+		section := path.Dir(key)
+		pages = append(pages, &page{
+			out: key + "/_index.md",
+			front: []string{
+				fmt.Sprintf("title: %q", f.title),
+				fmt.Sprintf("weight: %d", f.weight),
+				// the list's links are relative to the section's folder
+				"sourcePath: docs/site/" + section + "/README.md",
+				"editURL: https://github.com/anetos-dev/docs/edit/main/sync/main.go",
+				fmt.Sprintf("description: %q", f.title),
+			},
+			title:  f.title,
+			body:   b.Bytes(),
+			weight: f.weight,
+		})
+	}
+	return pages, moved, nil
 }

@@ -22,6 +22,10 @@ GitHub, at the branch or tag the pages come from. Other links
       {{- $rel = path.Dir $rel -}}
     {{- end -}}
     {{- $rel = strings.TrimSuffix ".md" $rel -}}
+    {{- /* a page ./sync moved into its group's folder */ -}}
+    {{- with index hugo.Data.moved $rel -}}
+      {{- $rel = . -}}
+    {{- end -}}
     {{- if in (slice "" "/" ".") $rel -}}
       {{- $page = site.Home -}}
     {{- else -}}

@@ -29,6 +29,8 @@ module:
     - { source: static, target: static }
     # docs/site's images and other files, copied by ./sync
     - { source: files, target: static }
+    # data/moved.json, written by ./sync: grouped pages' content paths
+    - { source: data, target: data }
 
 # Every page uses the documentation layout (sidebar, table of contents).
 cascade:

@@ -36,12 +36,20 @@ titles; each page learns its path in the framework's repository, so the
 relative links between pages, and to examples and code, keep working),
 then Hugo. A link to a page that doesn't exist is a build warning.
 
+The sidebar follows the pages' front matter. In each section, a page's
+`group:` puts it in a folder of the sidebar named after the group, and
+its `weight:` orders it in the group; the groups come in the order of
+their pages' weights. Pages keep their URL (`/guides/forms/`), whatever
+their group: `sync` sets it, and writes `data/moved.json` so relative
+links still find the page. The framework's `make docs-check` (its
+`docnav` command) checks that every page has both.
+
 Hugo reads `{{< … >}}` and `{{% … %}}` in the pages as shortcodes, even
 in code blocks; write `{{</* … */>}}` to show one literally.
 
 | Path | What |
 |---|---|
-| `sync/` | `docs/site` → `content/` |
+| `sync/` | `docs/site` → `content/` (and `data/moved.json`) |
 | `overlay/` | Pages of this site's own, copied over `content/` (the home page) |
 | `layouts/_markup/render-link.html` | Resolves the pages' relative links |
 | `layouts/_markup/render-image.html` | Resolves the pages' relative images (`./sync` copies docs/site's other files to `files/`) |
