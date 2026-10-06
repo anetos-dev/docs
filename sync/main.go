@@ -23,6 +23,8 @@
 //     to the new one for the link render hook. The group's folder gets
 //     an index listing its pages, and a section without a README lists
 //     its pages by group. The framework's docnav checks the groups.
+//   - Upgrade guides (upgrade/v0.3.md) are ordered newest first, by the
+//     version in their file name.
 //   - Other files (images…) are copied to the -files folder, which Hugo
 //     serves at their path in docs/site.
 //   - The files in overlay/ (the docs' home page) are copied over the top.
@@ -152,6 +154,9 @@ func run(src, out, files, overlay, data string) error {
 		}
 	}
 	for _, pg := range pages {
+		if w, ok := upgradeWeight(pg.rel); ok {
+			pg.set("weight", fmt.Sprint(w)) // the newest version first
+		}
 		if pg.rel != "" {
 			pg.set("sourcePath", "docs/site/"+pg.rel)
 			pg.set("editURL", repo+"/edit/main/docs/site/"+pg.rel)
@@ -441,4 +446,19 @@ func group(pages []*page) ([]*page, map[string]string, error) {
 		})
 	}
 	return pages, moved, nil
+}
+
+var upgradePage = regexp.MustCompile(`^upgrade/v(\d+)\.(\d+)(?:\.(\d+))?\.md$`)
+
+// upgradeWeight is the weight of an upgrade guide, which puts the newest
+// version first: v1.2 before v1.1 before v0.9.
+func upgradeWeight(rel string) (int, bool) {
+	m := upgradePage.FindStringSubmatch(rel)
+	if m == nil {
+		return 0, false
+	}
+	major, _ := strconv.Atoi(m[1])
+	minor, _ := strconv.Atoi(m[2])
+	patch, _ := strconv.Atoi(m[3])
+	return 1_000_000_000 - (major*1_000_000 + minor*1_000 + patch), true
 }

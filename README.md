@@ -42,7 +42,9 @@ its `weight:` orders it in the group; the groups come in the order of
 their pages' weights. Pages keep their URL (`/guides/forms/`), whatever
 their group: `sync` sets it, and writes `data/moved.json` so relative
 links still find the page. The framework's `make docs-check` (its
-`docnav` command) checks that every page has both.
+`docnav` command) checks that every page has both. Upgrade guides
+(`upgrade/v0.3.md`) are ordered newest first, by the version in their
+file name.
 
 Hugo reads `{{< … >}}` and `{{% … %}}` in the pages as shortcodes, even
 in code blocks; write `{{</* … */>}}` to show one literally.
