@@ -1,0 +1,2 @@
+# The project's security.txt (RFC 9116) is anetos.dev's.
+/.well-known/security.txt https://anetos.dev/.well-known/security.txt 301

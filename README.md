@@ -57,6 +57,7 @@ in code blocks; write `{{</* … */>}}` to show one literally.
 | `layouts/_markup/render-image.html` | Resolves the pages' relative images (`./sync` copies docs/site's other files to `files/`) |
 | `assets/lib/` | FlexSearch and Mermaid, at fixed versions (see its README) |
 | `static/` | Icons and logos, copied from [anetos-dev/website](https://github.com/anetos-dev/website)'s `brand/` |
+| `static/_redirects` | `/.well-known/security.txt` to anetos.dev's |
 
 ## Deployment
 
