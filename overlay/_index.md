@@ -11,7 +11,7 @@ accounts, queues, mail, storage, search, AI and translations, built on
 
 {{< callout type="info" >}}
 Anetos is pre-release. These pages follow the framework's main branch,
-where v0.3, the first public version, is being finished; APIs may change
+where v0.5, the first public release, is being finished; APIs may change
 until 1.0.
 {{< /callout >}}
 
@@ -28,7 +28,8 @@ until 1.0.
   about fifteen minutes.
 - Coming from Laravel or Rails? The [guides](guides/) map what you know:
   routes, models, migrations, queues and mail work much as you expect,
-  with types.
+  with types. The [glossary](concepts/glossary/) lists the words Anetos
+  uses, and Laravel's and Rails' for the same thing.
 - Upgrading? The [upgrade guides](upgrade/) list what changes between
   releases, and how to move your code.
 

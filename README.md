@@ -26,7 +26,7 @@ Go for the `sync` step.
 ```sh
 ANETOS_DIR=../anetos ./build.sh   # pages from a local checkout of the framework
 ./build.sh                        # pages from anetos-dev/anetos at main
-ANETOS_REF=v0.3.0 ./build.sh      # pages from a tag
+ANETOS_REF=v0.4.0 ./build.sh      # pages from a tag
 hugo server                       # after a build: http://localhost:1313
 ```
 
