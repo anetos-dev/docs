@@ -9,3 +9,23 @@
     });
   });
 </script>
+{{- /* The version menu and the banner link to the other versions' home
+pages (params.version.versions, from ./versions); this sends them to the
+same page there instead. A page missing from that version gets its 404
+page, which links to its home. */ -}}
+{{- with site.Params.version -}}
+{{- $urls := slice -}}
+{{- range .versions -}}{{- $urls = $urls | append .url -}}{{- end -}}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var versions = {{ $urls | jsonify | safeJS }};
+    var base = new URL({{ site.BaseURL }}).pathname;
+    var path = location.pathname;
+    if (path.indexOf(base) !== 0) return;
+    var rel = path.slice(base.length);
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      if (versions.indexOf(a.getAttribute("href")) >= 0 && !a.hasAttribute("data-version-home")) a.setAttribute("href", a.getAttribute("href") + rel + location.search + location.hash);
+    });
+  });
+</script>
+{{- end -}}

@@ -1,8 +1,13 @@
-{{- /* Hextra v0.13.0's head.html with the <title> from custom/title.html. */ -}}
+{{- /* Hextra v0.13.0's head.html with the <title> from custom/title.html,
+and noindex on the versions of the docs search engines leave out (main,
+older releases; params.version, from ./versions). */ -}}
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   {{- $noindex := .Params.noindex | default false -}}
+  {{- with site.Params.version -}}
+    {{- if .noindex -}}{{- $noindex = true -}}{{- end -}}
+  {{- end -}}
   {{ if and (hugo.IsProduction) (not $noindex) -}}
     <meta name="robots" content="index, follow" />
   {{ else -}}

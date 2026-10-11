@@ -1,0 +1,13 @@
+{{- /* What the docs home page says about the version it shows
+(params.version, from ./versions; none in a single-site build). */ -}}
+{{- $v := site.Params.version | default dict -}}
+{{- $kind := $v.kind | default "unreleased" -}}
+{{- if eq $kind "latest" -}}
+These pages are for Anetos {{ $v.name }}, the latest release; the version menu at the top switches to the docs of another version. APIs may change until 1.0.
+{{- else if eq $kind "main" -}}
+These pages follow the framework's main branch: the next release, not released yet. The latest release is <a href="{{ $v.latestURL }}">{{ $v.latest }}</a>.
+{{- else if eq $kind "older" -}}
+These pages are for Anetos {{ $v.name }}. The latest release is <a href="{{ $v.latestURL }}">{{ $v.latest }}</a>.
+{{- else -}}
+Anetos is pre-release. These pages follow the framework's main branch, where v0.5, the first public release, is being finished; APIs may change until 1.0.
+{{- end -}}

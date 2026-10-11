@@ -19,5 +19,6 @@ coverage.*
 node_modules/
 /content/
 /.anetos/
+/.versions/
 /files/
 /data/

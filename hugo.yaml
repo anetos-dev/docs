@@ -93,7 +93,6 @@ params:
     logo:
       path: brand/anetos-logo.svg
       dark: brand/anetos-logo-dark.svg
-      link: /
       width: 118
       height: 22
   page:

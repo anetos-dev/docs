@@ -1,0 +1,3 @@
+{{- /* "release candidate" for v0.6.0-rc.N, "pre-release" for any other. */ -}}
+{{- $pre := index (split . "-") 1 | default "" -}}
+{{- if hasPrefix $pre "rc" }}release candidate{{ else }}pre-release{{ end -}}

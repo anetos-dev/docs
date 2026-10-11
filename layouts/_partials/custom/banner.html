@@ -1,0 +1,19 @@
+{{- /* The banner of every version of the docs but the latest release
+(params.version and params.banner, from ./versions). The link to the
+latest release goes to the same page there (custom/head-end.html). */ -}}
+{{- with site.Params.version -}}
+<div class="hx:px-8">
+  {{- if eq .kind "unreleased" -}}
+    {{- with .prerelease -}}
+      {{- $v := split (strings.TrimPrefix "v" .) "." -}}
+      v{{ index $v 0 }}.{{ index $v 1 }} isn't released yet: these pages follow the main branch. To try it, <a class="hx:underline" href="{{ "getting-started/install/" | relURL }}">install</a> the {{ partial "custom/prerelease-kind.html" . }}, <code>{{ . }}</code>.
+    {{- else -}}
+      There is no release yet: these pages follow the main branch.
+    {{- end -}}
+  {{- else if eq .kind "main" -}}
+    Unreleased: these pages follow the main branch. The latest release is <a class="hx:underline" href="{{ .latestURL }}">{{ .latest }}</a>{{ with .prerelease }}, and <code>{{ . }}</code> is a {{ partial "custom/prerelease-kind.html" . }} of the next{{ end }}.
+  {{- else if eq .kind "older" -}}
+    These pages are for {{ .name }}. The latest release is <a class="hx:underline" href="{{ .latestURL }}">{{ .latest }}</a>.
+  {{- end -}}
+</div>
+{{- end -}}

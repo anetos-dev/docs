@@ -10,9 +10,7 @@ accounts, queues, mail, storage, search, AI and translations, built on
 `net/http`, in one binary.
 
 {{< callout type="info" >}}
-Anetos is pre-release. These pages follow the framework's main branch,
-where v0.5, the first public release, is being finished; APIs may change
-until 1.0.
+{{< docs-version >}}
 {{< /callout >}}
 
 {{< cards >}}
@@ -33,7 +31,7 @@ until 1.0.
 - Upgrading? The [upgrade guides](upgrade/) list what changes between
   releases, and how to move your code.
 
-Found a mistake? Every page has an "Edit this page" link: the pages live
-with the code, in the framework's
+Found a mistake? The pages live with the code, in the framework's
 [`docs/site`](https://github.com/anetos-dev/anetos/tree/main/docs/site)
-folder.
+folder; "Edit this page", on the pages of the latest release and of
+main, opens one there.
