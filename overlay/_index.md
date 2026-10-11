@@ -24,10 +24,11 @@ accounts, queues, mail, storage, search, AI and translations, built on
 
 - New to Anetos? [Getting started](getting-started/) builds a small app in
   about fifteen minutes.
-- Coming from Laravel or Rails? The [guides](guides/) map what you know:
-  routes, models, migrations, queues and mail work much as you expect,
-  with types. The [glossary](concepts/glossary/) lists the words Anetos
-  uses, and Laravel's and Rails' for the same thing.
+- Coming from another framework? Routes, models, migrations, queues and
+  mail work much as you expect, with types; the [guides](guides/) end
+  with notes that map what you know, and the
+  [glossary](concepts/glossary/) gives the words Anetos uses and other
+  frameworks' words for the same things.
 - Upgrading? The [upgrade guides](upgrade/) list what changes between
   releases, and how to move your code.
 
